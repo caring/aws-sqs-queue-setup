@@ -1,5 +1,5 @@
 name: create-sqs-queues
-description: Create SQS Queues and Redrive Policy if not exist
+description: Create SQS Queues and Redrive Policy
 author: DevOps Team
 
 inputs:
