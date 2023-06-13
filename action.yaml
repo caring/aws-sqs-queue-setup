@@ -49,9 +49,8 @@ runs:
         fi
 
         # Retrieve dead-letter queue ARN
-        deadLetterQueueArn=$(aws sqs get-queue-attributes --queue-url "${deadLetterQueueUrl}" \
-        --attribute-names QueueArn --output text --query 'Attributes.QueueArn')
-
+        deadLetterQueueArn=$(aws sqs get-queue-attributes --queue-url "${deadLetterQueueUrl}" --attribute-names QueueArn --output text --query 'Attributes.QueueArn')
+        
         # Create or update redrive policy
         maxReceiveCount="${{ inputs.maxReceiveCount }}"
         REDRIVE_POLICY=$(jq -n \
