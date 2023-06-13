@@ -52,8 +52,8 @@ runs:
         redrivePolicy=$(jq -n --arg dlq "$deadLetterQueueUrl" --arg count "$maxReceiveCount" '{deadLetterTargetArn: $dlq, maxReceiveCount: $count}')
         aws sqs set-queue-attributes --queue-url "${queueUrl}" --attributes "{\"RedrivePolicy\": \"${redrivePolicy}\"}"
 
-        # Output queue URLs and ARNs
+        # Output queue URL and queue names
         echo "::set-output name=queueUrl::${queueUrl}"
+        echo "::set-output name=queueName::${{ inputs.queueName }}"
         echo "::set-output name=deadLetterQueueUrl::${deadLetterQueueUrl}"
-        echo "::set-output name=queueArn::$(aws sqs get-queue-attributes --queue-url "${queueUrl}" --attribute-names QueueArn | jq -r '.Attributes.QueueArn')"
-        echo "::set-output name=deadLetterQueueArn::$(aws sqs get-queue-attributes --queue-url "${deadLetterQueueUrl}" --attribute-names QueueArn | jq -r '.Attributes.QueueArn
+        echo "::set-output name=deadLetterQueueName::${{ inputs.deadLetterQueueName }}"
