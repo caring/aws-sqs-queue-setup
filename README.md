@@ -52,5 +52,3 @@ jobs:
           echo "Main Queue Name: ${{ steps.sqs.outputs.queueName }}"
           echo "Dead-Letter Queue Name: ${{ steps.sqs.outputs.deadLetterQueueName }}"
 ```
-
-This action will create the specified SQS queues if they do not already exist and configure the redrive policy for the main queue. The action outputs the URLs and names of the created queues, which can be used in subsequent steps of your workflow.
