@@ -48,9 +48,12 @@ runs:
           deadLetterQueueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.deadLetterQueueName }}")
         fi
 
+        # Extract dead-letter queue name from URL
+        deadLetterQueueName=$(basename "$deadLetterQueueUrl")
+
         # Retrieve dead-letter queue ARN
         deadLetterQueueArn=$(aws sqs get-queue-attributes --queue-url "${deadLetterQueueUrl}" --attribute-names QueueArn --output text --query 'Attributes.QueueArn')
-        
+
         # Create or update redrive policy
         maxReceiveCount="${{ inputs.maxReceiveCount }}"
         REDRIVE_POLICY=$(jq -n \
