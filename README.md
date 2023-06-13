@@ -38,7 +38,7 @@ jobs:
 
       - name: Create SQS Queues and Redrive Policy
         id: sqs
-        uses: caring/provision-aws-sqs-queue@v1
+        uses: caring/provision-aws-sqs-queue@v1.0.1
         with:
           queueName: my-queue.fifo
           deadLetterQueueName: my-queue-dl.fifo
