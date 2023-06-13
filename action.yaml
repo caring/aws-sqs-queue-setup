@@ -51,7 +51,7 @@ runs:
         # Create or update redrive policy
         deadLetterTargetArn="{\"QueueUrl\": \"${deadLetterQueueUrl}\"}"
         redrivePolicy="{\"deadLetterTargetArn\": ${deadLetterTargetArn}, \"maxReceiveCount\": \"${maxReceiveCount}\"}"
-        aws sqs set-queue-attributes --queue-url "${queueUrl}" --attributes "{\"RedrivePolicy\": ${redrivePolicy}}"
+        aws sqs set-queue-attributes --queue-url "${queueUrl}" --attributes "RedrivePolicy=${redrivePolicy}"
 
         # Output queue URL and queue names
         echo "::set-output name=queueUrl::${queueUrl}"
