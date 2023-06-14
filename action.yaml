@@ -62,11 +62,10 @@ runs:
           --arg dlqa "$deadLetterQueueArn" \
           --arg mrc "$maxReceiveCount" \
           '{ deadLetterTargetArn: $dlqa, maxReceiveCount: $mrc }')
-        aws sqs set-queue-attributes --queue-url "${queueUrl}" --attributes "RedrivePolicy=${REDRIVE_POLICY}"
+        aws sqs set-queue-attributes --queue-url "${queueUrl}" --attributes "RedrivePolicy={\"deadLetterTargetArn\":\"${deadLetterQueueArn}\",\"maxReceiveCount\":\"${maxReceiveCount}\"}"
 
         # Output queue URL and queue names
         echo "::set-output name=queueUrl::${queueUrl}"
         echo "::set-output name=queueName::${{ inputs.queueName }}"
         echo "::set-output name=deadLetterQueueUrl::${deadLetterQueueUrl}"
         echo "::set-output name=deadLetterQueueName::${{ inputs.deadLetterQueueName }}"
-
