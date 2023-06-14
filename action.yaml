@@ -28,37 +28,37 @@ runs:
       run: |
         set -e
         # Create dead-letter queue
-        if ! aws sqs get-queue-url --queue-name "${inputs.deadLetterQueueName}" >/dev/null 2>&1; then
-          echo "Creating SQS Dead-Letter Queue '${inputs.deadLetterQueueName}'"
-          deadLetterQueueUrl=$(aws sqs create-queue --queue-name "${inputs.deadLetterQueueName}" --attributes FifoQueue=true)
-          echo "SQS Dead-Letter Queue '${inputs.deadLetterQueueName}' created. URL: ${deadLetterQueueUrl}"
+        if ! aws sqs get-queue-url --queue-name "${{ inputs.deadLetterQueueName }}" >/dev/null 2>&1; then
+          echo "Creating SQS Dead-Letter Queue '${{ inputs.deadLetterQueueName }}'"
+          deadLetterQueueUrl=$(aws sqs create-queue --queue-name "${{ inputs.deadLetterQueueName }}" --attributes FifoQueue=true)
+          echo "SQS Dead-Letter Queue '${{ inputs.deadLetterQueueName }}' created. URL: ${deadLetterQueueUrl}"
         else
-          echo "SQS Dead-Letter Queue '${inputs.deadLetterQueueName}' already exists."
-          deadLetterQueueUrl=$(aws sqs get-queue-url --queue-name "${inputs.deadLetterQueueName}")
+          echo "SQS Dead-Letter Queue '${{ inputs.deadLetterQueueName }}' already exists."
+          deadLetterQueueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.deadLetterQueueName }}")
         fi
         
         # Get only dead-letter queue URL without the queue name
         deadLetterQueueUrl=$(echo "${deadLetterQueueUrl}" | jq -r '.QueueUrl')
         
-        echo "SQS Dead-Letter Queue  '${inputs.deadLetterQueueName}' URL: ${deadLetterQueueUrl}"
+        echo "SQS Dead-Letter Queue  '${{ inputs.deadLetterQueueName }}' URL: ${deadLetterQueueUrl}"
         
         # Retrieve dead-letter queue ARN
         deadLetterQueueArn=$(aws sqs get-queue-attributes --queue-url "${deadLetterQueueUrl}" --attribute-names QueueArn | jq -r '.Attributes.QueueArn')
-        echo "SQS Dead-Letter Queue '${inputs.deadLetterQueueName}' ARN: ${deadLetterQueueArn}"
+        echo "SQS Dead-Letter Queue '${{ inputs.deadLetterQueueName }}' ARN: ${deadLetterQueueArn}"
         
-        if [[ $(aws sqs list-queues --queue-name-prefix "${inputs.queueName}") ]]; then
-          echo "SQS Queue '${inputs.queueName}' already exists"
+        if [[ $(aws sqs list-queues --queue-name-prefix "${{ inputs.queueName }}") ]]; then
+          echo "SQS Queue '${{ inputs.queueName }}' already exists"
         else
-          echo "Creating SQS Queue '${inputs.queueName}'"
+          echo "Creating SQS Queue '${{ inputs.queueName }}'"
           REDRIVE_POLICY=$(jq -n \
             --arg dlqa "${deadLetterQueueArn}" \
-            --arg mrc "${inputs.maxReceiveCount}" \
+            --arg mrc "${{ inputs.maxReceiveCount }}" \
             '{deadLetterTargetArn: $dlqa, maxReceiveCount: $mrc}' | jq tostring)
           JSON_STRING=$(jq -n \
-            --arg rp "${inputs.queueRetentionPeriod}" \
+            --arg rp "${{ inputs.queueRetentionPeriod }}" \
             --arg rp "${REDRIVE_POLICY}" \
             '{RedrivePolicy: $rp, MessageRetentionPeriod: $rp, FifoQueue: "true"}' | jq tostring)
           echo "${deadLetterQueueArn}"
-          aws sqs create-queue --queue-name "${inputs.queueName}" --attributes "$JSON_STRING"
-          echo "SQS Queue '${inputs.queueName}' created successfully"
-        fi
+          aws sqs create-queue --queue-name "${{ inputs.queueName }}" --attributes "$JSON_STRING"
+          echo "SQS Queue '${{ inputs.queueName }}' created successfully"
+fi
