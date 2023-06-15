@@ -38,7 +38,7 @@ jobs:
 
       - name: Create SQS Queues and Redrive Policy
         id: sqs
-        uses: caring/provision-aws-sqs-queue@v1.0.1
+        uses: caring/gh-provision-aws-sqs-queue@v1.0.1
         with:
           queueName: my-queue.fifo
           deadLetterQueueName: my-queue-dl.fifo
@@ -47,10 +47,10 @@ jobs:
 
       - name: Print Queue URLs and Names
         run: |
-          echo "Main Queue URL: ${{ steps.sqs.outputs.queueUrl }}"
-          echo "Dead-Letter Queue URL: ${{ steps.sqs.outputs.deadLetterQueueUrl }}"
-          echo "Main Queue Name: ${{ steps.sqs.outputs.queueName }}"
-          echo "Dead-Letter Queue Name: ${{ steps.sqs.outputs.deadLetterQueueName }}"
+          echo "Main Queue URL: ${{ env.queueUrl }}"
+          echo "Dead-Letter Queue URL: ${{ env.deadLetterQueueUrl }}"
+          echo "Main Queue Name: ${{ env.outputs.queueName }}"
+          echo "Dead-Letter Queue Name: ${{ env.deadLetterQueueName }}"
 ```
 
 This action will create the specified SQS queues if they do not already exist and configure the redrive policy for the main queue. The action outputs the URLs and names of the created queues, which can be used in subsequent steps of your workflow.
