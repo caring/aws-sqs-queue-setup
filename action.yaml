@@ -60,7 +60,7 @@ runs:
           fi
 
           # Output queue URL and queue names
-          echo "::set-output name=queueUrl::${queueUrl}"
-          echo "::set-output name=queueName::${{ inputs.queueName }}"
-          echo "::set-output name=deadLetterQueueUrl::${deadLetterQueueUrl}"
-          echo "::set-output name=deadLetterQueueName::${{ inputs.deadLetterQueueName }}"
+          echo "queueUrl: ${queueUrl}" >> $GITHUB_OUTPUT
+          echo "queueName: ${{ inputs.queueName }}" >> $GITHUB_OUTPUT
+          echo "deadLetterQueueUrl: ${deadLetterQueueUrl}" >> $GITHUB_OUTPUT
+          echo "deadLetterQueueName: ${{ inputs.deadLetterQueueName }}" >> $GITHUB_OUTPUT
