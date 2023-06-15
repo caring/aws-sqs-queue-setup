@@ -50,15 +50,15 @@ runs:
             echo "SQS Queue '${{ inputs.queueName }}' URL: ${queueUrl}"
           else
             echo "Creating SQS Queue '${{ inputs.queueName }}'"
-            redrivePolicy=$(jq -n \
+            REDRIVE_POLICY=$(jq -n \
               --arg dlqa "${deadLetterQueueArn}" \
               --arg mrc "${{ inputs.maxReceiveCount }}" \
               '{deadLetterTargetArn: $dlqa, maxReceiveCount: $mrc}' | jq tostring)
-            jsonAttributes=$(jq -n \
+            JSON_STRING=$(jq -n \
               --arg rp "${{ inputs.queueRetentionPeriod }}" \
-              --arg rp "${redrivePolicy}" \
+              --arg rp "${REDRIVE_POLICY}" \
               '{RedrivePolicy: $rp, MessageRetentionPeriod: $rp, FifoQueue: "true"}' | jq tostring)
-            aws sqs create-queue --queue-name "${{ inputs.queueName }}" --attributes "$jsonAttributes"
+            aws sqs create-queue --queue-name "${{ inputs.queueName }}" --attributes "$JSON_STRING"
             echo "SQS Queue '${{ inputs.queueName }}' created successfully"
             queueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.queueName }}" | jq -r '.QueueUrl')
             echo "SQS Queue '${{ inputs.queueName }}' URL: ${queueUrl}"
