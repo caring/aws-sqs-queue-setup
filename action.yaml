@@ -31,11 +31,11 @@ runs:
           if ! aws sqs get-queue-url --queue-name "${{ inputs.deadLetterQueueName }}" >/dev/null 2>&1; then
             echo "Creating SQS Dead-Letter Queue '${{ inputs.deadLetterQueueName }}'"
             aws sqs create-queue --queue-name "${{ inputs.deadLetterQueueName }}" --attributes FifoQueue=true
-            deadLetterQueueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.deadLetterQueueName }}") | jq -r '.QueueUrl'
+            deadLetterQueueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.deadLetterQueueName }}" | jq -r '.QueueUrl')
             echo "SQS Dead-Letter Queue '${{ inputs.deadLetterQueueName }}' created. URL: ${deadLetterQueueUrl}"
           else
             echo "SQS Dead-Letter Queue '${{ inputs.deadLetterQueueName }}' already exists."
-            deadLetterQueueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.deadLetterQueueName }}") | jq -r '.QueueUrl'
+            deadLetterQueueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.deadLetterQueueName }}" | jq -r '.QueueUrl')
             echo "SQS Dead-Letter Queue '${{ inputs.deadLetterQueueName }}' URL: ${deadLetterQueueUrl}"
           fi
 
@@ -49,7 +49,7 @@ runs:
 
           if [[ $(aws sqs list-queues --queue-name-prefix "${{ inputs.queueName }}") ]]; then
             echo "SQS Queue '${{ inputs.queueName }}' already exists"
-            queueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.queueName }}") | jq -r '.QueueUrl'
+            queueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.queueName }}" | jq -r '.QueueUrl')
           else
             echo "Creating SQS Queue '${{ inputs.queueName }}'"
             REDRIVE_POLICY=$(jq -n \
@@ -62,7 +62,7 @@ runs:
               '{RedrivePolicy: $rp, MessageRetentionPeriod: $rp, FifoQueue: "true"}' | jq tostring)
             aws sqs create-queue --queue-name "${{ inputs.queueName }}" --attributes "$JSON_STRING"
             echo "SQS Queue '${{ inputs.queueName }}' created successfully"
-            queueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.queueName }}") | jq -r '.QueueUrl'
+            queueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.queueName }}" | jq -r '.QueueUrl')
             echo "SQS Queue '${{ inputs.queueName }}' URL: ${queueUrl}"
           fi
 
