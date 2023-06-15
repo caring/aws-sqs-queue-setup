@@ -58,3 +58,9 @@ runs:
             aws sqs create-queue --queue-name "${{ inputs.queueName }}" --attributes "$JSON_STRING"
             echo "SQS Queue '${{ inputs.queueName }}' created successfully"
           fi
+
+          # Output queue URL and queue names
+          echo "::set-output name=queueUrl::${queueUrl}"
+          echo "::set-output name=queueName::${{ inputs.queueName }}"
+          echo "::set-output name=deadLetterQueueUrl::${deadLetterQueueUrl}"
+          echo "::set-output name=deadLetterQueueName::${{ inputs.deadLetterQueueName }}"
