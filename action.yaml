@@ -56,13 +56,12 @@ runs:
               '{deadLetterTargetArn: $dlqa, maxReceiveCount: $mrc}' | jq tostring)
             jsonAttributes=$(jq -n \
               --arg qrp "${{ inputs.queueRetentionPeriod }}" \
-              --arg rp "${redrivePolicy}" \
+              --argjson rp "$redrivePolicy" \
               '{RedrivePolicy: $rp, MessageRetentionPeriod: $qrp, FifoQueue: "true"}' | jq tostring)
             aws sqs create-queue --queue-name "${{ inputs.queueName }}" --attributes "$jsonAttributes"
             echo "SQS Queue '${{ inputs.queueName }}' created successfully"
             queueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.queueName }}" | jq -r '.QueueUrl')
             echo "SQS Queue '${{ inputs.queueName }}' URL: ${queueUrl}"
-          fi
   
           # Output queue URL and queue names
           echo "queueUrl=${queueUrl}" >> $GITHUB_ENV
