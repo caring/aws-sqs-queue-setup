@@ -53,7 +53,7 @@ runs:
             redrivePolicy=$(jq -n \
               --arg dlqa "${deadLetterQueueArn}" \
               --arg mrc "${{ inputs.maxReceiveCount }}" \
-              '{deadLetterTargetArn: $dlqa, maxReceiveCount: $mrc}' | jq tostring)
+              '{deadLetterTargetArn: $dlqa, maxReceiveCount: $mrc}')
             jsonAttributes=$(jq -n \
               --arg qrp "${{ inputs.queueRetentionPeriod }}" \
               --arg rp "${redrivePolicy}" \
