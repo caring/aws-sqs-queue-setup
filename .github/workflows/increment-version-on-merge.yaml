@@ -1,0 +1,68 @@
+# Purpose:
+#   Automatically calculates the next semantic version and creates a tag on the repository
+#   when a PR is merged.
+
+name: Increment Tag Version on Merge
+on:
+  pull_request:
+    types: [closed]
+    
+jobs:
+  increment_version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Get highest tag with v prefix
+        run: |
+          # Fetch tags from remote repository
+          git fetch --tags
+      
+          # Get all tags with v prefix and sort them
+          export TAGS=$(git tag -l "v*" --sort=-version:refname)
+      
+          # Extract the highest tag from the sorted list
+          export HIGHEST_TAG=$(echo "$TAGS" | head -n 1)
+      
+          # If no tag with v prefix exists, set HIGHEST_TAG to an empty string
+          if [ -z "$HIGHEST_TAG" ]; then
+            echo "No tag with v prefix found."
+            export HIGHEST_TAG=""
+          fi
+      
+          echo "Highest tag with v prefix: $HIGHEST_TAG"
+      
+          # Set HIGHEST_TAG as an environment variable in GitHub Actions environment
+          echo "HIGHEST_TAG=$HIGHEST_TAG" >> $GITHUB_ENV
+      
+      - name: Create new tag with v prefix
+        if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Extract major, minor, and patch versions from the last tag with v prefix
+          export HIGHEST_TAG_VERSION=$(echo "$HIGHEST_TAG" | sed 's/^v//' | sed 's/\./ /g' | awk '{print $1 "." $2 "." $3}')
+          IFS='.' read -ra VERSION <<< "$HIGHEST_TAG_VERSION"
+          MAJOR=${VERSION[0]}
+          MINOR=${VERSION[1]}
+          PATCH=${VERSION[2]}
+          echo "Major version: $MAJOR"
+          echo "Minor version: $MINOR"
+          echo "Patch version: $PATCH"          
+          
+          # Check if patch version is empty, if so, create a new tag with version v0.0.1
+          if [ -z "$PATCH" ]; then
+            export NEW_TAG="v0.0.1"
+          # Check if patch version is 9, if so, increment minor version and reset patch version
+          elif [ $PATCH -eq 9 ]; then
+            export NEW_TAG=$(echo "v$MAJOR.$((MINOR+1)).0")
+          # Increment patch version by 1
+          else
+            export NEW_TAG=$(echo "v$MAJOR.$MINOR.$((PATCH+1))")
+          fi
+
+          echo "New tag with v prefix: $NEW_TAG"
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
