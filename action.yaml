@@ -44,7 +44,7 @@ runs:
           deadLetterQueueArn=$(aws sqs get-queue-attributes --queue-url "${deadLetterQueueUrl}" --attribute-names QueueArn | jq -r '.Attributes.QueueArn')
   
           # Create or retrieve main queue
-          if [[ $(aws sqs list-queues --queue-name-prefix "${{ inputs.queueName }}") ]]; then
+          if aws sqs get-queue-url --queue-name "${{ inputs.queueName }}" >/dev/null 2>&1; then
             echo "SQS Queue '${{ inputs.queueName }}' already exists"
             queueUrl=$(aws sqs get-queue-url --queue-name "${{ inputs.queueName }}" | jq -r '.QueueUrl')
             echo "SQS Queue '${{ inputs.queueName }}' URL: ${queueUrl}"
